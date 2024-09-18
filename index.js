@@ -9,7 +9,7 @@ mongoose
 .then(() => console.log("Conectado ao MongoDB"))
 .catch((erro) => console.error("Erro ao conectar ao MongoDB:", erro));
 
-const cadastrar = mongoose.model("cadastrar", esquemacadastrar);
+
   async function criarTime(id, nome, valor, saldo) {
     try {
       const novoTime= new Time ({id, nome, valor, saldo});
