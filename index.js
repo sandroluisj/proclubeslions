@@ -13,7 +13,7 @@ const timeSchema = new mongoose.Schema({
   nome: { type: String, required: true },
   valor: { type: Number, required: true },
   artilheiros: { type: String, required: true },
-  partidasGanhas: { type: Number, default: 0 } 
+ 
 });
 
 const Time = mongoose.model("Time", timeSchema);
@@ -115,33 +115,7 @@ app.get("/time", async (req, res) => {
   }
 });
 
-app.post("/partida", async (req, res) => {
-  const { vencedorIndex, perdedorIndex } = req.body;
-  try {
-    const times = await Time.find();
-    if (
-      vencedorIndex < 0 ||
-      vencedorIndex >= times.length ||
-      perdedorIndex < 0 ||
-      perdedorIndex >= times.length
-    ) {
-      return res.status(400).send("Número de time inválido");
-    }
 
-    let timeVencedor = times[vencedorIndex];
-    let timePerdedor = times[perdedorIndex];
-
-    if (timeVencedor.valor > timePerdedor.valor) {
-      await Time.findByIdAndUpdate(timeVencedor._id, { $inc: { partidasGanhas: 1 } });
-      res.status(200).send(`Partida registrada: ${timeVencedor.nome} venceu ${timePerdedor.nome}`);
-    } else {
-      await Time.findByIdAndUpdate(timePerdedor._id, { $inc: { partidasGanhas: 1 } });
-      res.status(200).send(`Partida registrada: ${timePerdedor.nome} venceu ${timeVencedor.nome}.`);
-    }
-  } catch (erro) {
-    res.status(500).send("Erro ao registrar partida: " + erro);
-  }
-});
 
 const port = 3000;
 app.listen(port, () => {
