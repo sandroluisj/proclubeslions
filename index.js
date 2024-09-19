@@ -12,7 +12,7 @@ mongoose
 const timeSchema = new mongoose.Schema({
   nome: { type: String, required: true },
   valor: { type: Number, required: true },
-  artilheiros: [{ nome: String, gols: Number }],
+  artilheiros: { nome: String, gols: Number, required: true},
   
 });
 
