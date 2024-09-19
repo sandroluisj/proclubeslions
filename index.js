@@ -13,7 +13,7 @@ const timeSchema = new mongoose.Schema({
   nome: { type: String, required: true },
   valor: { type: Number, required: true },
   artilheiros: [{ nome: String, gols: Number }],
-  partidasGanhas: { type: Number, default: 0 }
+  
 });
 
 const Time = mongoose.model('Time', timeSchema);
