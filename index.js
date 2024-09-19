@@ -9,14 +9,14 @@ mongoose
   .then(() => console.log("Conectado ao MongoDB"))
   .catch((erro) => console.error("Erro ao conectar ao MongoDB:", erro));
 
-const timeSchema = new mongoose.Schema({
+const times = new mongoose.Schema({
   nome: { type: String, required: true },
   valor: { type: Number, required: true },
-  artilheiros: { nome: String, gols: Number, required: true},
+ artilheiros: { type: String, required: true},
   
 });
 
-const Time = mongoose.model('Time', timeSchema);
+const Time = mongoose.model('Time', times);
 
 async function criarTime(id, nome, valor, artilheiros) {
   try {
