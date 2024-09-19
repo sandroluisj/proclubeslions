@@ -9,11 +9,11 @@ mongoose
   .then(() => console.log("Conectado ao MongoDB"))
   .catch((erro) => console.error("Erro ao conectar ao MongoDB:", erro));
 
-
 const timeSchema = new mongoose.Schema({
   nome: { type: String, required: true },
   valor: { type: Number, required: true },
-  artilheiros: [{ nome: String, gols: Number }] 
+  artilheiros: [{ nome: String, gols: Number }],
+  partidasGanhas: { type: Number, default: 0 }
 });
 
 const Time = mongoose.model('Time', timeSchema);
@@ -30,7 +30,7 @@ async function criarTime(id, nome, valor, saldo, artilheiros) {
 
 app.post("/time", async (req, res) => {
   try {
-    const { id, nome, valor, saldo, artilheiros } = req.body; // Inclui artilheiros
+    const { id, nome, valor, saldo, artilheiros } = req.body;
     const novoTime = await criarTime(id, nome, valor, saldo, artilheiros);
     res.status(201).json({ mensagem: "Time criado com sucesso", time: novoTime });
   } catch (erro) {
@@ -115,7 +115,6 @@ app.get("/times", async (req, res) => {
   }
 });
 
-
 app.post('/partida', async (req, res) => {
   const { vencedorIndex, perdedorIndex } = req.body;
   try {
@@ -123,17 +122,15 @@ app.post('/partida', async (req, res) => {
     if (vencedorIndex < 0 || vencedorIndex >= times.length || perdedorIndex < 0 || perdedorIndex >= times.length) {
       return res.status(400).send("Número de time inválido");
     }
-    
+
     let timeVencedor = times[vencedorIndex];
     let timePerdedor = times[perdedorIndex];
 
     if (timeVencedor.valor > timePerdedor.valor) {
-      let temp = times[vencedorIndex];
-      times[vencedorIndex] = times[perdedorIndex];
-      times[perdedorIndex] = temp;
-
+      await Time.findByIdAndUpdate(timeVencedor._id, { $inc: { partidasGanhas: 1 } });
       res.status(200).send(`Partida registrada: ${timeVencedor.nome} venceu ${timePerdedor.nome}.`);
     } else {
+      await Time.findByIdAndUpdate(timePerdedor._id, { $inc: { partidasGanhas: 1 } });
       res.status(200).send(`Partida registrada: ${timePerdedor.nome} venceu ${timeVencedor.nome}.`);
     }
   } catch (erro) {
@@ -145,5 +142,3 @@ const port = 3000;
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
-
-  
