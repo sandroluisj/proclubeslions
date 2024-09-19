@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 mongoose
-  .connect("mongodb://localhost:27017/livraria")
+  .connect("mongodb://localhost:27017")
   .then(() => console.log("Conectado ao MongoDB"))
   .catch((erro) => console.error("Erro ao conectar ao MongoDB:", erro));
 
@@ -18,9 +18,9 @@ const timeSchema = new mongoose.Schema({
 
 const Time = mongoose.model('Time', timeSchema);
 
-async function criarTime(id, nome, valor, saldo, artilheiros) {
+async function criarTime(id, nome, valor, artilheiros, partidasGanhas) {
   try {
-    const novoTime = new Time({ id, nome, valor, saldo, artilheiros });
+    const novoTime = new Time({ id, nome, valor, artilheiros, partidasGanhas });
     return await novoTime.save();
   } catch (erro) {
     console.error("Erro ao criar Time:", erro);
@@ -31,18 +31,18 @@ async function criarTime(id, nome, valor, saldo, artilheiros) {
 app.post("/time", async (req, res) => {
   try {
     const { id, nome, valor, saldo, artilheiros } = req.body;
-    const novoTime = await criarTime(id, nome, valor, saldo, artilheiros);
+    const novoTime = await criarTime(id, nome, valor,artilheiros, partidasGanhas);
     res.status(201).json({ mensagem: "Time criado com sucesso", time: novoTime });
   } catch (erro) {
     res.status(500).json({ mensagem: "Erro ao criar time", erro: erro.message });
   }
 });
 
-async function atualizarTime(id, nome, valor, saldo, artilheiros) {
+async function atualizarTime(id, nome, valor, artilheiros ,partidasGanhas) {
   try {
     const timeAtualizado = await Time.findByIdAndUpdate(
       id,
-      { nome, valor, saldo, artilheiros },
+      { nome, valor, artilheiros, partidasGanhas },
       { new: true, runValidators: true }
     );
     return timeAtualizado;
@@ -56,7 +56,7 @@ app.put("/time/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { nome, valor, saldo, artilheiros } = req.body;
-    const timeAtualizado = await atualizarTime(id, nome, valor, saldo, artilheiros);
+    const timeAtualizado = await atualizarTime(id, nome, valor, artilheiros, partidasGanhas);
     if (timeAtualizado) {
       res.status(200).json({
         mensagem: "Time atualizado com sucesso!",
@@ -94,7 +94,7 @@ app.delete("/time/:id", async (req, res) => {
   }
 });
 
-async function obterTimes() {
+async function listartimes() {
   try {
     return await Time.find();
   } catch (erro) {
@@ -103,9 +103,9 @@ async function obterTimes() {
   }
 }
 
-app.get("/times", async (req, res) => {
+app.get("/time", async (req, res) => {
   try {
-    const times = await obterTimes();
+    const times = await listartimes();
     if (times.length === 0) {
       return res.status(200).send("Ainda não há times cadastrados");
     }
