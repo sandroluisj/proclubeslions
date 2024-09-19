@@ -18,9 +18,9 @@ const timeSchema = new mongoose.Schema({
 
 const Time = mongoose.model('Time', timeSchema);
 
-async function criarTime(id, nome, valor, artilheiros, partidasGanhas) {
+async function criarTime(id, nome, valor, artilheiros) {
   try {
-    const novoTime = new Time({ id, nome, valor, artilheiros, partidasGanhas });
+    const novoTime = new Time({ id, nome, valor, artilheiros});
     return await novoTime.save();
   } catch (erro) {
     console.error("Erro ao criar Time:", erro);
@@ -30,19 +30,19 @@ async function criarTime(id, nome, valor, artilheiros, partidasGanhas) {
 
 app.post("/time", async (req, res) => {
   try {
-    const { id, nome, valor, saldo, artilheiros } = req.body;
-    const novoTime = await criarTime(id, nome, valor,artilheiros, partidasGanhas);
+    const { id, nome, valor,artilheiros } = req.body;
+    const novoTime = await criarTime(id, nome, valor,artilheiros);
     res.status(201).json({ mensagem: "Time criado com sucesso", time: novoTime });
   } catch (erro) {
     res.status(500).json({ mensagem: "Erro ao criar time", erro: erro.message });
   }
 });
 
-async function atualizarTime(id, nome, valor, artilheiros ,partidasGanhas) {
+async function atualizarTime(id, nome, valor, artilheiros) {
   try {
     const timeAtualizado = await Time.findByIdAndUpdate(
       id,
-      { nome, valor, artilheiros, partidasGanhas },
+      { nome, valor, artilheiros },
       { new: true, runValidators: true }
     );
     return timeAtualizado;
@@ -55,8 +55,8 @@ async function atualizarTime(id, nome, valor, artilheiros ,partidasGanhas) {
 app.put("/time/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, valor, saldo, artilheiros } = req.body;
-    const timeAtualizado = await atualizarTime(id, nome, valor, artilheiros, partidasGanhas);
+    const { nome, valor,artilheiros } = req.body;
+    const timeAtualizado = await atualizarTime(id, nome, valor, artilheiros);
     if (timeAtualizado) {
       res.status(200).json({
         mensagem: "Time atualizado com sucesso!",
